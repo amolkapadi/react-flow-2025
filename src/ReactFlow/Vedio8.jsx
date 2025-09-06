@@ -8,7 +8,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-function App() {
+function Vedio8() {
   const intialNodes = [
     {
       id:"1",
@@ -127,4 +127,4 @@ function App() {
   );
 }
 
-export default App;
+export default Vedio8;
