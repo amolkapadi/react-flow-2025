@@ -1,12 +1,6 @@
-import { 
-  ReactFlow, 
-  useNodesState, 
-  useEdgesState, 
-  Background, 
-  MiniMap, 
-  Controls 
-} from '@xyflow/react';
+import { ReactFlow, useNodesState, useEdgesState, Background, Controls, MiniMap } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+
 
 function App() {
   const intialNodes = [
@@ -17,49 +11,38 @@ function App() {
       style:{
           background:"red",
           color:"#fff",
-          borderRadius:20,
-          width: 140,
-          height: 50
-      }
-    },
-    {
-      id:"2", 
+          borderRadius:20
+    }
+  },
+    {id:"2", 
       position : {x:50, y:200}, 
       data:{label:"Child Node 1"},
       style:{
         background:'green',
         color:"white",
         fontWeight:'bold',
-        fontSize:20,
-        width: 140,
-        height: 50
+        fontSize:20
       }
     },
-    {
-      id:"3", 
+    {id:"3", 
       position: {x:250, y:200}, 
       data:{label:"Child Node 2 "},
       style:{
         background:"blue",
         color:'white',
-        borderRadius:10,
-        width: 140,
-        height: 50
+        borderRadius:10
       }
     },
-    {
-      id:"4", 
+    {id:"4", 
       position: {x:450, y:200}, 
       data:{label:"Child Node 3"},
       style:{
         background:"#22c55e",
         color:'white',
-        borderRadius:10,
-        width: 140,
-        height: 50
+        borderRadius:10
       }
     }
-  ];
+  ]
 
   const initialEdges = [
     {
@@ -73,15 +56,14 @@ function App() {
       }
     },
     {
-      id:"e1-3", 
+      id:"e2-3", 
       source:"1", 
       target:"3",
       type:"smoothstep",
       style:{stroke:'blue', strokeWidth:2},
       animated:true
     },
-    {
-      id:"e1-4", 
+    {id:"e2-4", 
       source:"1", 
       target:"4",
       type:"bezier",
@@ -92,39 +74,33 @@ function App() {
       }
     }
   ];
-
   const [nodes, setNodes, onNodesChange] = useNodesState(intialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
   return (
     <div style={{width:"100vw", height:"100vh"}}>
       <ReactFlow  
-        nodes={nodes} 
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
+      nodes={nodes} 
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
       >
-        {/* 🔹 Background */}
-        <Background variant='cross' color='green' gap={80} />
-
-        {/* 🔹 MiniMap */}
-        <MiniMap 
-          nodeStrokeWidth={1}   // border की मोटाई
-          zoomable   // minimap zoom हो सकता है
-          pannable   // minimap pan किया जा सकता है
-          maskColor="red" // बाकी area का dim color
-          // position="top-left"   
-        />
-
-        {/* 🔹 Controls */}
-        <Controls 
-          showZoom={true} 
-          showFitView={true} 
-          showInteractive={true} 
-        />
+      {/* <Background variant='lines' color='red' size={10} gap={8}/> */}
+       <Background variant='cross' color='green'  gap={80}/>
+       <Controls 
+          showZoom={true}
+          showFitView={true}
+          showInteractive={true}
+          position='top-right'
+       />
+       <MiniMap 
+        zoomable
+        pannable
+        maskColor='red'
+        position='top-left'
+       />
       </ReactFlow>
     </div>  
-  );
+    );
 }
 
 export default App;
