@@ -1,103 +1,72 @@
-import { ReactFlow, useNodesState, useEdgesState, Background, Controls, MiniMap } from '@xyflow/react';
+import {ReactFlow, useNodesState, useEdgesState, addEdge, Handle, Position } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 
+function CustomNode ({data}){
+  return(
+    <div 
+      style={{
+        padding:10,
+        border:'2px solid #333',
+        borderRadius:10,
+        background:"yellow",
+        color:"#000",
+        textAlign:"center",
+        minWidth:150
+      }}
+    >
+    <Handle 
+      type='target'
+      position={Position.Top}
+      style={{background:'red', width:10, height:10}}
+    />
+      <h4 style={{margin:0}}>{data.label}</h4>
+      <button 
+        style={{
+          marginTop:8,
+          padding:"6px 10px",
+          background:"blue",
+          borderRadius:6,
+          cursor:"pointer",
+          color:"white"
+        }}
+      >Click me</button>
+      <Handle 
+      type='source'
+      position={Position.Bottom}
+      style={{background:'blue', width:10, height:10}}
+      />
+    </div>
+  )
+}
+
+
 function App() {
-  const intialNodes = [
-    {
-      id:"1",
-      position : {x:100, y:100}, 
-      data:{label:"Parents Node"}, 
-      style:{
-          background:"red",
-          color:"#fff",
-          borderRadius:20
-    }
-  },
-    {id:"2", 
-      position : {x:50, y:200}, 
-      data:{label:"Child Node 1"},
-      style:{
-        background:'green',
-        color:"white",
-        fontWeight:'bold',
-        fontSize:20
-      }
-    },
-    {id:"3", 
-      position: {x:250, y:200}, 
-      data:{label:"Child Node 2 "},
-      style:{
-        background:"blue",
-        color:'white',
-        borderRadius:10
-      }
-    },
-    {id:"4", 
-      position: {x:450, y:200}, 
-      data:{label:"Child Node 3"},
-      style:{
-        background:"#22c55e",
-        color:'white',
-        borderRadius:10
-      }
-    }
+  const initialNodes = [
+    {id:"1", position: {x:100, y:100}, data:{label:"Node 1"}, type:"custom"},
+    {id:"2", position: {x:300, y:100}, data:{label:"Node 2"}, type:"custom"},
+   
   ]
 
-  const initialEdges = [
-    {
-      id:"e1-2", 
-      source:"1", 
-      target:"2",
-      type:'step',
-      style:{
-        stroke:"red",
-        strokeWidth:3
-      }
-    },
-    {
-      id:"e2-3", 
-      source:"1", 
-      target:"3",
-      type:"smoothstep",
-      style:{stroke:'blue', strokeWidth:2},
-      animated:true
-    },
-    {id:"e2-4", 
-      source:"1", 
-      target:"4",
-      type:"bezier",
-      style:{
-        stroke:"green",
-        strokeWidth:3,
-        strokeDasharray:"15"
-      }
-    }
-  ];
-  const [nodes, setNodes, onNodesChange] = useNodesState(intialNodes);
+  const initialEdges =[];
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+
+  const nodeTypes = {custom :CustomNode};
+  
   return (
     <div style={{width:"100vw", height:"100vh"}}>
-      <ReactFlow  
-      nodes={nodes} 
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        nodeTypes={nodeTypes}
+        onConnect={(params) => setEdges((eds) => addEdge(params, eds))}
       >
-      {/* <Background variant='lines' color='red' size={10} gap={8}/> */}
-       <Background variant='cross' color='green'  gap={80}/>
-       <Controls 
-          showZoom={true}
-          showFitView={true}
-          showInteractive={true}
-          position='top-right'
-       />
-       <MiniMap 
-        zoomable
-        pannable
-        maskColor='red'
-        position='top-left'
-       />
+
       </ReactFlow>
     </div>  
     );
