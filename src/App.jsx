@@ -1,75 +1,58 @@
-import {ReactFlow, useNodesState, useEdgesState, addEdge, Handle, Position } from '@xyflow/react';
+import { ReactFlow, Controls, ControlButton, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-
-
-function CustomNode ({data}){
-  return(
-    <div 
-      style={{
-        padding:10,
-        border:'2px solid #333',
-        borderRadius:10,
-        background:"yellow",
-        color:"#000",
-        textAlign:"center",
-        minWidth:150
-      }}
-    >
-    <Handle 
-      type='target'
-      position={Position.Top}
-      style={{background:'red', width:10, height:10}}
-    />
-      <h4 style={{margin:0}}>{data.label}</h4>
-      <button 
-        style={{
-          marginTop:8,
-          padding:"6px 10px",
-          background:"blue",
-          borderRadius:6,
-          cursor:"pointer",
-          color:"white"
-        }}
-      >Click me</button>
-      <Handle 
-      type='source'
-      position={Position.Bottom}
-      style={{background:'blue', width:10, height:10}}
-      />
-    </div>
-  )
-}
-
-
+import { SquarePlus, Trash2 } from 'lucide-react';  // 👈 नए icons
+import Vedio13 from './ReactFlow/Vedio13'
 function App() {
-  const initialNodes = [
-    {id:"1", position: {x:100, y:100}, data:{label:"Node 1"}, type:"custom"},
-    {id:"2", position: {x:300, y:100}, data:{label:"Node 2"}, type:"custom"},
-   
-  ]
-
-  const initialEdges =[];
+  // Start with empty nodes & edges
+  const initialNodes = [];
+  const initialEdges = [];
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
+  // Add Node function
+  const addNode = () => {
+    const newNode = {
+      id: `${nodes.length + 1}`,
+      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      data: { label: `Node ${nodes.length + 1}` },
+      style: {
+        background: "#3b82f6",
+        color: "#fff",
+        padding: 10,
+        borderRadius: 8,
+      },
+    };
+    setNodes((nds) => [...nds, newNode]);
+  };
 
-  const nodeTypes = {custom :CustomNode};
-  
-  return (
-    <div style={{width:"100vw", height:"100vh"}}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
-        onConnect={(params) => setEdges((eds) => addEdge(params, eds))}
-      >
+  // Remove Last Node function
+  const removeNode = () => {
+    if (nodes.length > 0) {
+      setNodes((nds) => nds.slice(0, -1));
+      setEdges((eds) =>
+        eds.filter(
+          (edge) =>
+            edge.source !== `${nodes.length}` && edge.target !== `${nodes.length}`
+        )
+      );
+    }
+  };
 
-      </ReactFlow>
-    </div>  
+  // Connect Nodes with drag
+  const onConnect = (params) =>
+    setEdges((eds) =>
+      addEdge(
+        { ...params, animated: true, style: { stroke: "orange", strokeWidth: 2 } },
+        eds
+      )
     );
+
+  return (
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <Vedio13 />
+    </div>
+  );
 }
 
 export default App;
