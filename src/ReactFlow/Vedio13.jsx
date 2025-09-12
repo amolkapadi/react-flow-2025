@@ -13,23 +13,39 @@ function CustomNode({ id, data, setNodes, selectedNodeId, setSelectedNodeId }) {
   // Visible while hovering OR if this node is selected
   const isVisible = hover || selectedNodeId === id;
 
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    setNodes((nds) => nds.filter((node) => node.id !== id));
-    if (selectedNodeId === id) setSelectedNodeId(null);
-  };
+  const handleDelete = (e) => {  
+  e.stopPropagation(); // इवेंट की propagation (ऊपर तक जाने की प्रक्रिया) को रोक देता है ताकि parent इवेंट्स trigger न हों  
 
-  const handleEdit = (e) => {
-    e.stopPropagation();
-    const newLabel = prompt("Enter new label:", data.label);
-    if (newLabel !== null && newLabel !== "") {
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === id ? { ...node, data: { ...node.data, label: newLabel } } : node
-        )
-      );
-    }
-  };
+  setNodes((nds) => nds.filter((node) => node.id !== id));  
+  // setNodes के जरिए nodes की state को अपडेट करता है और filter करके current node (जिसका id match हो रहा है) हटा देता है  
+
+  if (selectedNodeId === id) setSelectedNodeId(null);  
+  // अगर delete किया जाने वाला node वही है जो selectedNodeId में है,  
+  // तो selectedNodeId को null कर देता है (मतलब कोई node select नहीं रहेगा)  
+};  
+
+const handleEdit = (e) => {  
+  e.stopPropagation(); // parent इवेंट को trigger होने से रोकता है  
+
+  const newLabel = prompt("Enter new label:", data.label);  
+  // यूज़र से नया label input लेने के लिए prompt बॉक्स दिखाता है (default value पुराना label रहेगा)  
+
+  if (newLabel !== null && newLabel !== "") {  
+    // चेक करता है कि user ने cancel नहीं किया और खाली string भी नहीं डाली  
+
+    setNodes((nds) =>  
+      nds.map((node) =>  
+        node.id === id  
+          ? { ...node, data: { ...node.data, label: newLabel } }  
+          : node  
+      )  
+    );  
+    // setNodes से nodes की state अपडेट करता है →  
+    // जिस node का id match करेगा, उसकी data.label को नए label से अपडेट करेगा  
+    // बाकी nodes को वैसे का वैसा ही रहने देगा  
+  }  
+};  
+
 
   return (
     <div
