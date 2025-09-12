@@ -1,7 +1,7 @@
 import { ReactFlow, Controls, ControlButton, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { SquarePlus, Trash2 } from 'lucide-react';  // 👈 नए icons
-import Vedio13 from './ReactFlow/Vedio13'
+
 function App() {
   // Start with empty nodes & edges
   const initialNodes = [];
@@ -50,7 +50,23 @@ function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
-      <Vedio13 />
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}   // 👈 drag connect enable
+        fitView
+      >
+        <Controls>
+          <ControlButton onClick={addNode} title="Add Node">
+            <SquarePlus size={18} />
+          </ControlButton>
+          <ControlButton onClick={removeNode} title="Remove Node">
+            <Trash2 size={18} />
+          </ControlButton>
+        </Controls>
+      </ReactFlow>
     </div>
   );
 }
