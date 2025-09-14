@@ -1,74 +1,118 @@
-import { ReactFlow, Controls, ControlButton, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
+import React, { useState } from "react";
+import {Controls, ReactFlow, useNodesState, NodeToolbar} from "@xyflow/react";
 import '@xyflow/react/dist/style.css';
-import { SquarePlus, Trash2 } from 'lucide-react';  // 👈 नए icons
 
-function App() {
-  // Start with empty nodes & edges
-  const initialNodes = [];
-  const initialEdges = [];
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+function CustomNode({id, data, setNodes, selectedNodeId, setSelectedNodeId}){
+    const [hover, setHover] = useState(false);
 
-  // Add Node function
-  const addNode = () => {
-    const newNode = {
-      id: `${nodes.length + 1}`,
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
-      data: { label: `Node ${nodes.length + 1}` },
-      style: {
-        background: "#3b82f6",
-        color: "#fff",
-        padding: 10,
-        borderRadius: 8,
-      },
-    };
-    setNodes((nds) => [...nds, newNode]);
-  };
+    const isVisible = hover || selectedNodeId === id;
 
-  // Remove Last Node function
-  const removeNode = () => {
-    if (nodes.length > 0) {
-      setNodes((nds) => nds.slice(0, -1));
-      setEdges((eds) =>
-        eds.filter(
-          (edge) =>
-            edge.source !== `${nodes.length}` && edge.target !== `${nodes.length}`
-        )
-      );
+    const handleDelete = (e) => {
+      e.stopPropagation();
+      setNodes((nds) => nds.filter((node)=> node.id !== id))
+      if(selectedNodeId === id) setSelectedNodeId(null);
+
     }
-  };
+    const handleEdit = (e) => {
+        e.stopPropagation();
+        const newLabel = prompt("Enter new Label:", data.label);
+        
+        if(newLabel !== null && newLabel !== ""){
+          setNodes((nds) => 
+            nds.map((node) => 
+            node.id === id ? {...node, data:{...node.data, label:newLabel}}:node)
+          );
+        }
 
-  // Connect Nodes with drag
-  const onConnect = (params) =>
-    setEdges((eds) =>
-      addEdge(
-        { ...params, animated: true, style: { stroke: "orange", strokeWidth: 2 } },
-        eds
+    }
+
+
+  return( 
+    <div 
+      style={{
+        padding:12,
+        border:"1px solid #333",
+        borderRadius:8,
+        background:"blue",
+        textAlign:"center",
+        minWidth:140,
+        cursor:"pointer",
+        color:"white"
+      }}
+      onMouseEnter={()=> setHover(true)}
+      onMouseLeave={()=>setHover(false)}
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelectedNodeId(id);
+      }}
+    >
+      <NodeToolbar isVisible={isVisible} position="top">
+          <button
+          onClick={handleEdit}
+            style={{
+              background:"green",
+              color:"white",
+              border:"none",
+              padding:"6px 10px",
+              marginRight:6,
+              borderRadius:6,
+              cursor:"pointer"
+            }}
+          >
+          Edit
+          </button>
+          <button
+          onClick={handleDelete}
+              style={{
+              background:"red",
+              color:"white",
+              border:"none",
+              padding:"6px 10px",
+              borderRadius:6,
+              cursor:"pointer"
+            }}
+          >
+          Delete
+          </button>
+
+      </NodeToolbar>
+      <div style={{pointerEvents:"none"}}>
+          <strong>{data.label}</strong>
+      </div>
+    </div>
+  )
+}
+
+export default function App() {
+    const initialNodes =[
+      {id:"1", position : {x:120,y:120}, data: {label:"Node 1"}, type:"custom"},
+      {id:"2", position : {x:420,y:120}, data: {label:"Node 2"}, type:"custom"}
+    ]
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
+    const [selectedNodeId, setSelectedNodeId] = useState(null);
+
+    const nodeTypes = {
+      custom :(props) =>(
+        <CustomNode 
+          {...props}
+          setNodes={setNodes}
+          selectedNodeId={selectedNodeId}
+          setSelectedNodeId={setSelectedNodeId}
+        />
       )
-    );
+    }
 
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}   // 👈 drag connect enable
-        fitView
-      >
-        <Controls>
-          <ControlButton onClick={addNode} title="Add Node">
-            <SquarePlus size={18} />
-          </ControlButton>
-          <ControlButton onClick={removeNode} title="Remove Node">
-            <Trash2 size={18} />
-          </ControlButton>
-        </Controls>
-      </ReactFlow>
+    <div style={{ width: "100vw", height: "100vh" }}>
+        <ReactFlow
+          nodes={nodes}
+          onNodesChange={onNodesChange}
+          nodeTypes={nodeTypes}
+          onPaneClick={() =>setSelectedNodeId(null)}
+        >
+          <Controls />
+        </ReactFlow>
     </div>
   );
 }
-
-export default App;
